@@ -1,71 +1,58 @@
 package ufrn.imd.jv.springcolumn;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class ColumnService {
 
-    @Value("${service.user}")
-    private String userService;
+    private final UserServiceInterface userService;
 
-    @Value("${service.board}")
-    private String boardService;
+    private final BoardServiceInterface boardService;
 
     private final ColumnRepository repository;
 
-    private final RestTemplate restTemplate;
-
     @Autowired
-    public ColumnService(ColumnRepository repository, RestTemplate restTemplate) {
+    public ColumnService(UserServiceInterface userServiceInterface,
+                         BoardServiceInterface boardServiceInterface,
+                         ColumnRepository repository) {
+        this.userService = userServiceInterface;
+        this.boardService = boardServiceInterface;
         this.repository = repository;
-        this.restTemplate = restTemplate;
-    }
-
-    public boolean entidadeEhValida(String path, Long id) {
-        ResponseEntity<String> response = restTemplate.exchange(
-                path+"/"+id,
-                HttpMethod.GET,
-                null,
-                String.class);
-        return response.getStatusCode().is2xxSuccessful();
     }
 
     public ColumnEntity save(ColumnEntity columnEntity) {
-        if(columnEntity == null) {
+        if (columnEntity == null) {
             throw new RuntimeException("Entidade não informada");
         }
-
         if (columnEntity.getUserId() == null) {
             throw new RuntimeException("Usuário não informado");
         }
-        if(!entidadeEhValida(userService, columnEntity.getUserId())) {
+        ResponseEntity<Map<String, String>> responseUser = userService.getUser(columnEntity.getUserId());
+        if (!responseUser.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Usuário informado não existe");
         }
-
         if (columnEntity.getBoardId() == null) {
             throw new RuntimeException("Board não informado");
         }
-        if(!entidadeEhValida(boardService, columnEntity.getBoardId())) {
+        ResponseEntity<Map<String, String>> responseBoard = boardService.getBoard(columnEntity.getBoardId());
+        if (!responseBoard.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Board informado não existe");
         }
-
         if (columnEntity.getName() == null) {
             throw new RuntimeException("Nome da coluna não informada");
         }
-        if(!columnEntity.getName().trim().equals("")) {
+        if (!columnEntity.getName().trim().equals("")) {
             throw new RuntimeException("Nome da coluna informado é inválido");
         }
         Optional<ColumnEntity> optValue = repository.findByNameAndBoardId(columnEntity.getName(), columnEntity.getBoardId());
-        if(optValue.isPresent()) {
+        if (optValue.isPresent()) {
             throw new RuntimeException("Nome da coluna já está em uso nesse board");
         }
         return repository.save(columnEntity);
