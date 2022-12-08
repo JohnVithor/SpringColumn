@@ -12,18 +12,14 @@ import java.util.Optional;
 @Service
 public class ColumnService {
 
-    private final UserServiceInterface userService;
-
-    private final BoardServiceInterface boardService;
+    private final ColumnResilience resilience;
 
     private final ColumnRepository repository;
 
     @Autowired
-    public ColumnService(UserServiceInterface userServiceInterface,
-                         BoardServiceInterface boardServiceInterface,
+    public ColumnService(ColumnResilience resilience,
                          ColumnRepository repository) {
-        this.userService = userServiceInterface;
-        this.boardService = boardServiceInterface;
+        this.resilience = resilience;
         this.repository = repository;
     }
 
@@ -34,15 +30,13 @@ public class ColumnService {
         if (columnEntity.getUserId() == null) {
             throw new RuntimeException("Usuário não informado");
         }
-        ResponseEntity<Map<String, String>> responseUser = userService.getUser(columnEntity.getUserId());
-        if (!responseUser.getStatusCode().is2xxSuccessful()) {
+        if (!resilience.isUserValid(columnEntity.getUserId())) {
             throw new RuntimeException("Usuário informado não existe");
         }
         if (columnEntity.getBoardId() == null) {
             throw new RuntimeException("Board não informado");
         }
-        ResponseEntity<Map<String, String>> responseBoard = boardService.getBoard(columnEntity.getBoardId());
-        if (!responseBoard.getStatusCode().is2xxSuccessful()) {
+        if (!resilience.isBoardValid(columnEntity.getBoardId())) {
             throw new RuntimeException("Board informado não existe");
         }
         if (columnEntity.getName() == null) {

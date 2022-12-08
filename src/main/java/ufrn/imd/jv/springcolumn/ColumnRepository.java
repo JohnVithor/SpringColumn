@@ -13,4 +13,8 @@ public interface ColumnRepository extends JpaRepository<ColumnEntity, Long> {
     Page<ColumnEntity> findByBoardIdIs(Long id, PageRequest pageRequest);
 
     Optional<ColumnEntity> findByNameAndBoardId(String name, Long id);
+
+    boolean existsByUserId(Long id);
+    boolean existsByBoardId(Long id);
+
 }
