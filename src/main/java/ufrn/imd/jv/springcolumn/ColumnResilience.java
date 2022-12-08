@@ -24,14 +24,14 @@ public class ColumnResilience {
     }
 
     @CircuitBreaker(name = "isUserValid_cb", fallbackMethod = "isUserKnown")
-    @Bulkhead(name = "isUserValid_bh", fallbackMethod = "isUserKnown")
+    @Bulkhead(name = "isUserValid_bh", fallbackMethod = "isUserKnown", type = Bulkhead.Type.THREADPOOL)
     public boolean isUserValid(Long id) {
         ResponseEntity<Map<String, String>> response = userService.getUser(id);
         return response.getStatusCode().is2xxSuccessful();
     }
 
     @CircuitBreaker(name = "isBoardValid_cb", fallbackMethod = "isBoardKnown")
-    @Bulkhead(name = "isBoardValid_bh", fallbackMethod = "isBoardKnown")
+    @Bulkhead(name = "isBoardValid_bh", fallbackMethod = "isBoardKnown", type = Bulkhead.Type.THREADPOOL)
     public boolean isBoardValid(Long id) {
         ResponseEntity<Map<String, String>> response = boardService.getBoard(id);
         return response.getStatusCode().is2xxSuccessful();
@@ -47,7 +47,7 @@ public class ColumnResilience {
             System.err.println("Usuário foi encontrado, portanto é válido");
             return true;
         } else {
-            System.err.println("Não foi encontrado board criado pelo usuário de id="+id);
+            System.err.println("Não foi encontrado board criado pelo usuário de id=" + id);
             return false;
         }
     }
@@ -62,7 +62,7 @@ public class ColumnResilience {
             System.err.println("Board foi encontrado, portanto é válido");
             return true;
         } else {
-            System.err.println("Não foi encontrado column associado ao board de id="+id);
+            System.err.println("Não foi encontrado column associado ao board de id=" + id);
             return false;
         }
     }
