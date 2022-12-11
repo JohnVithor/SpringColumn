@@ -24,14 +24,14 @@ public class ColumnResilience {
     }
 
     @CircuitBreaker(name = "isUserValid_cb", fallbackMethod = "isUserKnown")
-    @Bulkhead(name = "isUserValid_bh", fallbackMethod = "isUserKnown", type = Bulkhead.Type.THREADPOOL)
+    @Bulkhead(name = "isUserValid_bh", fallbackMethod = "isUserKnown")
     public boolean isUserValid(Long id) {
         ResponseEntity<Map<String, String>> response = userService.getUser(id);
         return response.getStatusCode().is2xxSuccessful();
     }
 
     @CircuitBreaker(name = "isBoardValid_cb", fallbackMethod = "isBoardKnown")
-    @Bulkhead(name = "isBoardValid_bh", fallbackMethod = "isBoardKnown", type = Bulkhead.Type.THREADPOOL)
+    @Bulkhead(name = "isBoardValid_bh", fallbackMethod = "isBoardKnown")
     public boolean isBoardValid(Long id) {
         ResponseEntity<Map<String, String>> response = boardService.getBoard(id);
         return response.getStatusCode().is2xxSuccessful();

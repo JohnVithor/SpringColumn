@@ -41,7 +41,7 @@ public class ColumnService {
         if (columnEntity.getName() == null) {
             throw new RuntimeException("Nome da coluna não informada");
         }
-        if (!columnEntity.getName().trim().equals("")) {
+        if (columnEntity.getName().trim().equals("")) {
             throw new RuntimeException("Nome da coluna informado é inválido");
         }
         Optional<ColumnEntity> optValue = repository.findByNameAndBoardId(columnEntity.getName(), columnEntity.getBoardId());
