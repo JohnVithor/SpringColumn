@@ -30,8 +30,8 @@ public class ColumnController {
         return service.getPage(page.orElse(0), limit.orElse(10));
     }
 
-    @GetMapping(path = "boards/{id}")
-    public ResponseEntity<Page<ColumnEntity>> getBoardId(@PathVariable Long id,
+    @GetMapping(path = "board/{id}")
+    public ResponseEntity<Page<ColumnEntity>> getByBoardId(@PathVariable Long id,
                                                          @RequestParam(name = "pg", required = false) Optional<Integer> page,
                                                          @RequestParam(name = "lim", required = false) Optional<Integer> limit) {
         return service.getByBoardId(id, page.orElse(0), limit.orElse(10));
